@@ -130,7 +130,7 @@ export class AdicionarGrupoComponent implements OnInit {
         this.ref.close(true)
       },
       (error) =>{
-        console.log("erro")
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: error.error });
       }
     )
   }
