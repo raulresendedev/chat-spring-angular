@@ -4,4 +4,5 @@ export interface notificacao{
     username: string;
     mensagem: string;
     visto: boolean;
+    data: Date;
 }

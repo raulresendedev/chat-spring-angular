@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -20,4 +22,6 @@ public class NotificacaoUser {
     private String mensagem;
     @Column(name = "VISTO", nullable = false)
     private boolean visto;
+    @Column(name = "DATA", nullable = false)
+    private Date data;
 }

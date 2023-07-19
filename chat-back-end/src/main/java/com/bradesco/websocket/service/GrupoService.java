@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,6 +76,7 @@ public class GrupoService {
                     notificacao.setUsername(user.username());
                     notificacao.setMensagem("Você foi adicionado ao grupo " + nomeGrupo);
                     notificacao.setVisto(false);
+                    notificacao.setData(new Date());
                     return notificacao;
                 })
                 .collect(Collectors.toList());
@@ -111,7 +114,7 @@ public class GrupoService {
             List<String> usernames = grupoDto.users().stream()
                     .map(UserDto::username)
                     .toList();
-            
+
             List<GrupoUsers> existingUsers = grupoUserRepository.findByIdGrupo(id);
 
             List<GrupoUsers> usersToAdd = usernames.stream()
@@ -160,6 +163,7 @@ public class GrupoService {
                     notificacao.setUsername(user.getUsername());
                     notificacao.setMensagem(mensagem);
                     notificacao.setVisto(false);
+                    notificacao.setData(new Date());
                     return notificacao;
                 })
                 .toList();

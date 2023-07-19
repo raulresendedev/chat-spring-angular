@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface NotificacaoUserRepository extends JpaRepository<NotificacaoUser, Long> {
 
-    @Query("SELECT n FROM NotificacaoUser n WHERE n.username = :username")
+    @Query("SELECT n FROM NotificacaoUser n WHERE n.username = :username ORDER BY n.data desc")
     List<NotificacaoUser> obterNotificacaoDoUsuario(@Param("username") String username);
 }

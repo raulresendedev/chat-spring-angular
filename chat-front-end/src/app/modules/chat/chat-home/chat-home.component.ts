@@ -158,7 +158,7 @@ export class ChatHomeComponent implements OnInit {
             if (indice !== -1) {
               this.notificacoesUsuario[indice] = novaNotificacao;
             } else {
-              this.notificacoesUsuario.push(novaNotificacao);
+              this.notificacoesUsuario.unshift(novaNotificacao);
             }
           });
           
