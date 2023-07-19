@@ -8,9 +8,11 @@ import com.bradesco.websocket.dto.UserDto;
 import com.bradesco.websocket.repository.GrupoRepository;
 import com.bradesco.websocket.repository.GrupoUserRepository;
 import com.bradesco.websocket.repository.NotificacaoUserRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -100,74 +102,72 @@ public class GrupoService {
         return ResponseEntity.ok(usersDto);
     }
 
+    @Transactional
     public ResponseEntity<?> editarGrupo(long id, GrupoWithUsersDto grupoDto){
-
-        Grupo grupo = new Grupo(id, grupoDto);
-
-        try{
+        try {
+            Grupo grupo = new Grupo(id, grupoDto);
             grupoRepository.save(grupo);
-        }catch (Exception e){
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
 
-        return editarUsuariosDoGrupo(id, grupo.getNome(), grupoDto.users());
+            List<String> usernames = grupoDto.users().stream()
+                    .map(UserDto::username)
+                    .toList();
+            
+            List<GrupoUsers> existingUsers = grupoUserRepository.findByIdGrupo(id);
+
+            List<GrupoUsers> usersToAdd = usernames.stream()
+                    .filter(username -> existingUsers.stream().noneMatch(user -> user.getUsername().equals(username)))
+                    .map(username -> {
+                        GrupoUsers newUser = new GrupoUsers();
+                        newUser.setIdGrupo(id);
+                        newUser.setUsername(username);
+                        return newUser;
+                    })
+                    .toList();
+
+            List<GrupoUsers> usersToDelete = existingUsers.stream()
+                    .filter(user -> !usernames.contains(user.getUsername()))
+                    .toList();
+
+            grupoUserRepository.saveAll(usersToAdd);
+
+            grupoUserRepository.deleteAll(usersToDelete);
+
+            notificoesCriarEnviar(usersToAdd, "Você foi adicionado ao grupo " + grupo.getNome());
+
+            notificoesCriarEnviar(usersToDelete, "Você foi removido do grupo " + grupo.getNome());
+
+            usersToDelete.stream()
+                    .map(GrupoUsers::getUsername)
+                    .forEach(websocketService::notifyGroup);
+
+            grupoDto.users().stream()
+                    .map(UserDto::username)
+                    .forEach(websocketService::notifyGroup);
+
+            return ResponseEntity.ok(existingUsers);
+
+        }catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return ResponseEntity.internalServerError().body("Erro ao editar grupo");
+        }
     }
 
-    private ResponseEntity<?> editarUsuariosDoGrupo(long idGrupo, String nomeGrupo, List<UserDto> users){
+    private void notificoesCriarEnviar(List<GrupoUsers> usuarios, String mensagem){
 
-        List<String> usernames = users.stream()
-                .map(UserDto::username)
-                .toList();
-
-        List<GrupoUsers> existingUsers = grupoUserRepository.findByIdGrupo(idGrupo);
-
-        List<GrupoUsers> usersToDelete = existingUsers.stream()
-                .filter(user -> !usernames.contains(user.getUsername()))
-                .collect(Collectors.toList());
-
-        List<NotificacaoUser> notificacoesDelete = usersToDelete.stream()
+        List<NotificacaoUser> notificacoes = usuarios.stream()
                 .map(user -> {
                     NotificacaoUser notificacao = new NotificacaoUser();
                     notificacao.setUsername(user.getUsername());
-                    notificacao.setMensagem("Você foi removido do grupo " + nomeGrupo);
+                    notificacao.setMensagem(mensagem);
                     notificacao.setVisto(false);
                     return notificacao;
                 })
                 .toList();
 
-        grupoUserRepository.deleteAll(usersToDelete);
+        notificacaoUserRepository.saveAll(notificacoes);
 
-        notificacaoUserRepository.saveAll(notificacoesDelete);
-
-        notificacoesDelete
+        notificacoes
                 .forEach(websocketService::enviarNotificacaoUser);
-
-        usersToDelete.stream()
-                .map(GrupoUsers::getUsername)
-                .forEach(websocketService::notifyGroup);
-
-        for (String username : usernames) {
-            if (existingUsers.stream().noneMatch(user -> user.getUsername().equals(username))) {
-                GrupoUsers newUser = new GrupoUsers();
-                newUser.setIdGrupo(idGrupo);
-                newUser.setUsername(username);
-                grupoUserRepository.save(newUser);
-
-                NotificacaoUser notificacao = new NotificacaoUser();
-                notificacao.setUsername(username);
-                notificacao.setMensagem("Você foi adicionado ao grupo " + nomeGrupo);
-                notificacao.setVisto(false);
-
-                notificacaoUserRepository.save(notificacao);
-
-                websocketService.enviarNotificacaoUser(notificacao);
-            }
-        }
-
-        users.stream()
-                .map(UserDto::username)
-                .forEach(websocketService::notifyGroup);
-
-        return ResponseEntity.ok(existingUsers);
     }
+
 }
