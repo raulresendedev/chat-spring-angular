@@ -1,0 +1,38 @@
+<div class="parent-container">
+  <div class="search-fill">
+    <p-button icon="pi pi-plus" styleClass="p-button-success" label="Grupo" (onClick)="abrirModalAdicionar('ADICIONAR', null)"></p-button>
+    <p-button  (onClick)="showNotifications()" label="Avisos" icon="pi pi pi-bell" badge="{{notificacoesNaoVistas()}}" class="margin--left"></p-button>
+  </div>
+    <div class="sidebar">
+      <div class="gruposUser" *ngFor="let grupo of gruposUsuario">
+          <div [ngClass]="{'grupo-selecionado': grupo == grupoSelecionado }" class="gruposUser--card" (click)="selectGrupo(grupo)">
+            <p-avatar label="{{grupo.nome.charAt(0).toUpperCase()}}" styleClass="mr-2" size="medium"></p-avatar>
+            <p class="nome-grupo">{{grupo.nome}}</p>  
+          </div>
+      </div>
+    </div>
+    <div class="search">
+      <div class="grupo--info" *ngIf="grupoSelecionado">
+        <p-menu #menu [model]="items" [popup]="true"></p-menu>
+        <p-button (click)="menu.toggle($event)" pRipple styleClass="p-button-rounded p-button-secondary p-button-text" icon="pi pi pi-ellipsis-v"></p-button>
+        <p-avatar label="{{grupoSelecionado.nome.charAt(0).toUpperCase()}}" styleClass="mr-2" size="medium"></p-avatar>
+        <h2>{{grupoSelecionado.nome}}</h2>
+      </div>
+      <p-button (onClick)="closeGrupo()" [ngClass]="{'display-none': !grupoSelecionado}" pRipple styleClass="p-button-rounded p-button-danger p-button-text" icon="pi pi pi-times" style="margin-left: auto;"></p-button>
+    </div>
+    <div class="conversation">
+      <ng-container *ngIf="grupoSelecionado">
+        <router-outlet></router-outlet>
+      </ng-container>
+    </div>
+</div>
+  
+<p-dialog [(visible)]="geeks" [style]="{ width: '50vw' }" header="Notificações">
+  <div class="gruposUser" *ngFor="let notificacoes of notificacoesUsuario" (mouseenter)="marcarNotificacaoComoVista(notificacoes)">
+      <div class="notificacoes--card" [ngClass]="{'notificacao--nova': !notificacoes.visto }" >
+        <i class="pi pi-info-circle" style="font-size: 1.5rem"></i>
+        <p class="notificacao--msg">{{notificacoes.mensagem}}</p>  
+        <p-button class="margin--left" pRipple styleClass="p-button-rounded p-button-danger p-button-text" icon="pi pi pi-trash"></p-button>
+      </div>
+  </div>
+</p-dialog>

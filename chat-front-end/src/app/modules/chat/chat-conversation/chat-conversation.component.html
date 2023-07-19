@@ -1,0 +1,13 @@
+<div class="container">
+    <div class="message-container" #messagecontainer>
+        <div class="message-balloon" [ngClass]="{'other': message.username != userLogado, 'you': message.username == userLogado}" *ngFor="let message of greetings">
+            <p class="user">{{message.username}}</p>
+            <p class="message" style="white-space: pre-line">{{message.mensagem}}</p>
+            <p class="timestamp">{{ message.data | date: 'HH:mm' }}</p>
+        </div>
+    </div>
+    <div class="send-container">
+        <textarea class="message-box" rows="2" pInputTextarea [autoResize]="false" [(ngModel)]="inputValue"></textarea>
+        <p-button icon="pi pi-send" styleClass="p-button-lg p-button-success p-button-rounded" (click)="sendMessage()" [ngClass]="{'p-disabled': !inputValue || inputValue.trim().length === 0}"></p-button>
+    </div>
+</div>

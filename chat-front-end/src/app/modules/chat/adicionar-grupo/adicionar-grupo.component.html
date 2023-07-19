@@ -1,0 +1,48 @@
+<form [formGroup]="formulario">
+    <div class="formgrid grid">
+        <div class="field col-12 md:col-6 gap-form">
+            <span class="p-float-label">
+                <input pInputText class="w-full" formControlName="nome" maxlength="50" />
+                <label htmlFor="nome">Nome do grupo</label>
+            </span>
+        </div>
+        <span class="field field-relative col-12 md:col-6 gap-form">
+            <span class="p-input-icon-left w-full">
+                <i class="pi pi-search"></i>
+                <input class="p-inputtext-lg" placeholder="Buscar usuários" type="text" pInputText class="w-full" (click)="searchUsers($event)" (input)="searchUsers($event)" />
+            </span>
+            <div #searchResults class="search-results" *ngIf="usuarios.length > 0" >
+                <app-chat-card *ngFor="let result of usuarios" [name]="result.nome" [username]="result.username" (cardClick)="onCardClicked(result)"></app-chat-card>
+            </div>
+        </span>
+        <div class="field col-12 md:col-6 gap-form">
+            <div class="userSelecionados">
+                <p>Usuarios do Grupo</p>
+                <div class="userSelecionado--card" *ngFor="let usuario of usuariosSelecionados">
+                    <p-avatar label="{{usuario.nome.charAt(0)}}" styleClass="mr-2" size="large"></p-avatar>
+                    <div class="userSelecionado--info">
+                        <label>{{usuario.nome}}</label>
+                        <label>{{usuario.username}}</label>
+                    </div>
+                    <p-button *ngIf="usuario.username != usuarioLogado" (onClick)="removerUserSelecionado(usuario)" pRipple styleClass="p-button-rounded p-button-danger p-button-text p-button-sm" icon="pi pi pi-trash"></p-button>
+                </div>
+                <small [ngClass]="{'text-danger': validarUsuariosSelecionados(), 'text-success': !validarUsuariosSelecionados()}">Adicione 2 Usuários</small>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="cancelarAdicionarContainer">
+    <p-button styleClass="p-button-secondary" label="Cancelar" (click)="fecharModal()"></p-button>
+
+    <div *ngIf="isAdicionar()">
+        <p-button styleClass="p-button-success" icon="pi pi-plus" label="Adicionar" 
+                [disabled]="!formularioValido || validarUsuariosSelecionados()"  (onClick)="adicionar()"
+                [loading]="loading"></p-button>
+    </div>
+    <div *ngIf="isEditar()">
+        <p-button styleClass="p-button-success" icon="pi pi-save" label="Salvar" 
+                [disabled]="!formularioValido" (onClick)="editar()"
+                [loading]="loading"></p-button>
+    </div>
+</div>

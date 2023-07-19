@@ -1,0 +1,137 @@
+.parent-container{
+    background-color: blue;
+    width: 100%;
+    height: calc(100vh - 64px);
+    display: grid;
+    grid-template-columns: 1fr 3.5fr; 
+    grid-template-rows: 1fr 10fr;
+    grid-template-areas:
+    "search-fill search"
+    "sidebar conversation";
+}
+
+.sidebar {
+    grid-area: sidebar;
+    background-color: #EFEFEF;
+    overflow: auto;    
+}
+
+.search-fill{
+    grid-area: search-fill;
+    background-color: #BDBDBD;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0px 0px 0px 10px;
+}
+
+.search {
+    grid-area: search;
+    background-color: #BDBDBD;
+    display: flex;
+    align-items: center;
+    padding: 0px 10px 0px 0px;
+}
+  
+.conversation {
+    grid-area: conversation;
+    background-color: rgb(211, 211, 211);
+    overflow: auto;   
+}
+
+.gruposUser{
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+}
+
+.gruposUser--card{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    background-color: #EFEFEF;
+    padding: 3px 0px 3px 10px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.gruposUser--info{
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.gruposUser--card:hover{
+    background-color: #e0e0e0;
+    cursor: pointer;
+}
+
+.grupo-selecionado{
+    background-color: #dddddd;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .sidebar::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 3px;
+  }
+  
+  .sidebar::-webkit-scrollbar-track {
+    background-color: #f2f2f2;
+  }
+
+  .grupo--info{
+    display: flex;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  }
+
+  .grupo--info > h2 {
+    margin: 0;
+    font-weight: normal;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .nome-grupo{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .display-none {
+    display: none;
+  }
+  
+  .notificacoes--card{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #dddddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+  }
+
+  .notificacao--nova{
+    background-color: #eff5fa;
+    border-color: #abd9ff;
+  }
+
+  .notificacao--nova:hover{
+    cursor: pointer;
+  }
+
+  .notificacoes--card > i {
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+
+  .margin--left {
+    margin-left: auto;
+    margin-right: 10px;
+  }

@@ -1,0 +1,28 @@
+.chat-card{
+    padding: 5px 5px 5px 5px;
+    display: flex;
+    width: 100%;
+    background-color: #E0E0E0;
+    border-bottom: 1px solid rgb(138, 138, 138);
+}
+
+.chat-info{
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.chat-info :first-child{
+    font-weight: bold;
+}
+
+.chat-card:hover{
+    cursor: pointer;
+    background-color: #EEEEEE;
+}
+
+label:hover{
+    cursor: pointer;
+    background-color: #EEEEEE;
+}
