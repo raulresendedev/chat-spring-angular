@@ -32,7 +32,7 @@
       <div class="notificacoes--card" [ngClass]="{'notificacao--nova': !notificacoes.visto }" >
         <i class="pi pi-info-circle" style="font-size: 1.5rem"></i>
         <p class="notificacao--msg">{{notificacoes.mensagem}}</p>  
-        <p-button class="margin--left" pRipple styleClass="p-button-rounded p-button-danger p-button-text" icon="pi pi pi-trash"></p-button>
+        <p-button (onClick)="apagarNotificacao(notificacoes.idNotificaoUser)" class="margin--left" pRipple styleClass="p-button-rounded p-button-danger p-button-text" icon="pi pi pi-trash"></p-button>
       </div>
   </div>
 </p-dialog>

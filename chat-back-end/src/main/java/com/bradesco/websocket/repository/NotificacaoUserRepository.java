@@ -11,4 +11,6 @@ public interface NotificacaoUserRepository extends JpaRepository<NotificacaoUser
 
     @Query("SELECT n FROM NotificacaoUser n WHERE n.username = :username ORDER BY n.data desc")
     List<NotificacaoUser> obterNotificacaoDoUsuario(@Param("username") String username);
+
+    void deleteById(long idNotificacao);
 }

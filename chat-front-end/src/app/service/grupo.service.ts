@@ -28,4 +28,8 @@ export class GrupoService {
   obterUsuariosDoGrupo(data: number){
     return this.httpClient.get<User[]>(`${this.API}/usuarios-do-grupo/${data}`)
   }
+
+  sairDoGrupo(idGrupo: number, username:string){
+    return this.httpClient.delete(`${this.API}/${idGrupo}/${username}`, {responseType:"text"})
+  }
 }

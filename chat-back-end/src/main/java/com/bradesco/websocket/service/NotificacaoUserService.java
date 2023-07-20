@@ -33,4 +33,9 @@ public class NotificacaoUserService {
 
         return notificacao;
     }
+
+    public ResponseEntity<?> deletarNotificacao(long idNotificacao){
+        notificacaoUserRepository.deleteById(idNotificacao);
+        return ResponseEntity.ok("Notificação Deletada");
+    }
 }

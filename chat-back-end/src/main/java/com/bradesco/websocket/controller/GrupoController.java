@@ -33,4 +33,9 @@ public class GrupoController {
     public ResponseEntity<?> editar(@PathVariable("idGrupo") long id, @RequestBody GrupoWithUsersDto grupoDto){
         return grupoService.editarGrupo(id, grupoDto);
     }
+
+    @DeleteMapping("/{idGrupo}/{username}")
+    public ResponseEntity<?> removerUserDoGrupo(@PathVariable("idGrupo") Long idGrupo, @PathVariable("username") String username){
+        return grupoService.removerUserDoGrupo(idGrupo, username);
+    }
 }

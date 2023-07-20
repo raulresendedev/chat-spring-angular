@@ -14,4 +14,8 @@ export class notificacaoService {
   obterNotificacao(data: string){
     return this.httpClient.get<notificacao[]>(`${this.API}/${data}`)
   }
+
+  apagarNotificacao(idNotificacao: number){
+    return this.httpClient.delete(`${this.API}/${idNotificacao}`, {responseType:"text"})
+  }
 }

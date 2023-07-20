@@ -4,6 +4,7 @@ import com.bradesco.websocket.service.NotificacaoUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,5 +19,10 @@ public class NotificacaoUserController {
     @GetMapping("/{username}")
     public ResponseEntity<?> obterNotificacoes(@PathVariable("username") String username){
         return notificacaoUserService.obterNotificacoes(username);
+    }
+
+    @DeleteMapping({"/{idNotificacao}"})
+    public ResponseEntity<?> deltarNotificacao(@PathVariable("idNotificacao") long idNotificacao){
+        return notificacaoUserService.deletarNotificacao(idNotificacao);
     }
 }

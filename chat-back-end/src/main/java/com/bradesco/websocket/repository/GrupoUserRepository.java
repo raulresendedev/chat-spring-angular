@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface GrupoUserRepository extends JpaRepository<GrupoUsers, Long> {
 
+    void deleteByUsernameAndIdGrupo(String username, long idGrupo);
     List<GrupoUsers> findByIdGrupo(long idGrupo);
 }

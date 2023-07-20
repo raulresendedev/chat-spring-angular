@@ -9,6 +9,7 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { MenuModule } from 'primeng/menu';
 import { DialogModule } from 'primeng/dialog';
 import { BadgeModule } from 'primeng/badge';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
     exports: [
@@ -21,7 +22,8 @@ import { BadgeModule } from 'primeng/badge';
       SplitButtonModule,
       MenuModule,
       DialogModule,
-      BadgeModule
+      BadgeModule,
+      ConfirmDialogModule
     ]
 
   })
