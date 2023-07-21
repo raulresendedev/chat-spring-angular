@@ -2,10 +2,8 @@ package com.bradesco.websocket.service;
 
 import com.bradesco.websocket.bean.Message;
 import com.bradesco.websocket.bean.NotificacaoUser;
-import com.bradesco.websocket.bean.ResponseMessage;
 import com.bradesco.websocket.repository.GrupoRepository;
 import com.bradesco.websocket.repository.MessageRepository;
-import com.bradesco.websocket.repository.NotificacaoUserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -19,17 +17,19 @@ public class WebsocketService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final MessageRepository messageRepository;
     private final GrupoRepository grupoRepository;
-    private final NotificacaoUserRepository notificacaoUserRepository;
 
     public void notifyGroup(String idGrupo, final String messageChat) throws JsonProcessingException {
-        ResponseMessage responseMessage = new ResponseMessage(messageChat);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         Message message = objectMapper.readValue(messageChat, Message.class);
         messageRepository.save(message);
 
-        simpMessagingTemplate.convertAndSend("/topic/grupo/"+idGrupo, responseMessage);
+        simpMessagingTemplate.convertAndSend("/topic/grupo/"+idGrupo, message);
+    }
+
+    public void notifyGroupInfo(Message message) {
+        simpMessagingTemplate.convertAndSend("/topic/grupo/"+message.getIdGrupo(), message);
     }
 
     public void notifyGroup(String username){

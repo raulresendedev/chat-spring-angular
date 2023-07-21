@@ -26,6 +26,9 @@ public class Message {
     @Column(name = "MENSAGEM", nullable = false, length = 1500)
     private String mensagem;
 
+    @Column(name="NOTIFICACAO", nullable = false)
+    private boolean notificacao;
+
     @Column(name = "DATA", nullable = false)
     private Date data;
 

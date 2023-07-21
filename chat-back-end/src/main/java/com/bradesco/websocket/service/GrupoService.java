@@ -2,11 +2,13 @@ package com.bradesco.websocket.service;
 
 import com.bradesco.websocket.bean.Grupo;
 import com.bradesco.websocket.bean.GrupoUsers;
+import com.bradesco.websocket.bean.Message;
 import com.bradesco.websocket.bean.NotificacaoUser;
 import com.bradesco.websocket.dto.GrupoWithUsersDto;
 import com.bradesco.websocket.dto.UserDto;
 import com.bradesco.websocket.repository.GrupoRepository;
 import com.bradesco.websocket.repository.GrupoUserRepository;
+import com.bradesco.websocket.repository.MessageRepository;
 import com.bradesco.websocket.repository.NotificacaoUserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,7 @@ public class GrupoService {
     private final WebsocketService websocketService;
     private final AdminClientService adminClientService;
     private final NotificacaoUserRepository notificacaoUserRepository;
+    private final MessageRepository messageRepository;
 
     public ResponseEntity<?> adicionarGrupo(GrupoWithUsersDto grupoDto){
 
@@ -63,39 +66,38 @@ public class GrupoService {
 
             grupoUserRepository.saveAll(listaGrupoUsers);
 
+            infoMessagesCriarEnviar(idGrupo, listaGrupoUsers, " foi adicionado ao grupo");
 
+            notificoesCriarEnviar(listaGrupoUsers, "Você foi adicionado ao grupo " + nomeGrupo);
+
+            users.stream()
+                    .map(UserDto::username)
+                    .forEach(websocketService::notifyGroup);
+
+            return ResponseEntity.ok("Grupo Cadastrado");
 
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
 
-        List<NotificacaoUser> listaGrupoUsers = users.stream()
-                .map(user -> {
-                    NotificacaoUser notificacao = new NotificacaoUser();
-                    notificacao.setUsername(user.username());
-                    notificacao.setMensagem("Você foi adicionado ao grupo " + nomeGrupo);
-                    notificacao.setVisto(false);
-                    notificacao.setData(new Date());
-                    return notificacao;
-                })
-                .collect(Collectors.toList());
-
-        notificacaoUserRepository.saveAll(listaGrupoUsers);
-
-        users.stream()
-                .map(UserDto::username)
-                .forEach(websocketService::notifyGroup);
-
-        listaGrupoUsers
-                .forEach(websocketService::enviarNotificacaoUser);
-
-        return ResponseEntity.ok("Grupo Cadastrado");
-
     }
 
     @Transactional
     public ResponseEntity<?> removerUserDoGrupo(long idGrupo, String username){
+
         grupoUserRepository.deleteByUsernameAndIdGrupo(username, idGrupo);
+
+        Message infoMessage = new Message();
+        infoMessage.setIdGrupo(idGrupo);
+        infoMessage.setUsername("INFO");
+        infoMessage.setMensagem(username + " saiu do grupo");
+        infoMessage.setNotificacao(true);
+        infoMessage.setData(new Date());
+
+        messageRepository.save(infoMessage);
+
+        websocketService.notifyGroupInfo(infoMessage);
+
         return ResponseEntity.ok("Saiu do Grupo");
     }
 
@@ -140,6 +142,10 @@ public class GrupoService {
 
             grupoUserRepository.deleteAll(usersToDelete);
 
+            infoMessagesCriarEnviar(id, usersToAdd, " foi adicionado ao grupo");
+
+            infoMessagesCriarEnviar(id, usersToDelete, " foi removido do grupo");
+
             notificoesCriarEnviar(usersToAdd, "Você foi adicionado ao grupo " + grupo.getNome());
 
             notificoesCriarEnviar(usersToDelete, "Você foi removido do grupo " + grupo.getNome());
@@ -158,6 +164,23 @@ public class GrupoService {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return ResponseEntity.internalServerError().body("Erro ao editar grupo");
         }
+    }
+
+    private void infoMessagesCriarEnviar(long grupoId, List<GrupoUsers> infoUser, String mensagem){
+        List<Message> addInfoMessages = infoUser.stream()
+                .map(user -> {
+                    Message infoMessage = new Message();
+                    infoMessage.setIdGrupo(grupoId);
+                    infoMessage.setUsername("INFO");
+                    infoMessage.setMensagem(user.getUsername() + mensagem);
+                    infoMessage.setNotificacao(true);
+                    infoMessage.setData(new Date());
+                    return infoMessage;
+                }).toList();
+
+        messageRepository.saveAll(addInfoMessages);
+
+        addInfoMessages.forEach(websocketService::notifyGroupInfo);
     }
 
     private void notificoesCriarEnviar(List<GrupoUsers> usuarios, String mensagem){

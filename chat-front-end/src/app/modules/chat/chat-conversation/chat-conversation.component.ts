@@ -114,7 +114,8 @@ export class ChatConversationComponent implements OnChanges {
       username: this.authService.getUserName(),
       idGrupo: this.grupoSelecionado,
       mensagem: this.inputValue, 
-      data: new Date()
+      data: new Date(),
+      notificacao: false
     };
 
     if (this.stompClient && this.stompClient.connected) {
@@ -131,10 +132,8 @@ export class ChatConversationComponent implements OnChanges {
   }
 
   showMessage(message: string) {
-    const parsedMessage = JSON.parse(message);
+    const mensagemObj = JSON.parse(message);
     
-    const mensagemObj: Mensagem = JSON.parse(parsedMessage.content);
-
     const chatContainerElement = this.chatContainer.nativeElement;
     
     if(chatContainerElement.scrollTop < -30){

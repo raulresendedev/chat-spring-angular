@@ -5,4 +5,5 @@ export interface Mensagem{
     username: string;
     mensagem: string;
     data: Date;
+    notificacao: boolean;
 }

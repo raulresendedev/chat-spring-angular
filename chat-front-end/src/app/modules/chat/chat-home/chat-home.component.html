@@ -1,7 +1,7 @@
 <div class="parent-container">
   <div class="search-fill">
     <p-button icon="pi pi-plus" styleClass="p-button-success" label="Grupo" (onClick)="abrirModalAdicionar('ADICIONAR', null)"></p-button>
-    <p-button  (onClick)="showNotifications()" label="Avisos" icon="pi pi pi-bell" badge="{{notificacoesNaoVistas()}}" class="margin--left"></p-button>
+    <p-button  (onClick)="showNotifications()" label="Avisos" icon="pi pi pi-bell" badge="{{notificacoesNaoVistas()}}"></p-button>
   </div>
     <div class="sidebar">
       <div class="gruposUser" *ngFor="let grupo of gruposUsuario">
@@ -18,7 +18,7 @@
         <p-avatar label="{{grupoSelecionado.nome.charAt(0).toUpperCase()}}" styleClass="mr-2" size="medium"></p-avatar>
         <h2>{{grupoSelecionado.nome}}</h2>
       </div>
-      <p-button (onClick)="closeGrupo()" [ngClass]="{'display-none': !grupoSelecionado}" pRipple styleClass="p-button-rounded p-button-danger p-button-text" icon="pi pi pi-times" style="margin-left: auto;"></p-button>
+      <p-button (onClick)="closeGrupo()" [ngClass]="{'display-none': !grupoSelecionado}" pRipple styleClass="p-button-rounded p-button-danger p-button-text" icon="pi pi pi-times" class="margin--left"></p-button>
     </div>
     <div class="conversation">
       <ng-container *ngIf="grupoSelecionado">
