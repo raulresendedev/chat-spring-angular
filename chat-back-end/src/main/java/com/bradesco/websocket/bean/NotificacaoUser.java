@@ -24,4 +24,11 @@ public class NotificacaoUser {
     private boolean visto;
     @Column(name = "DATA", nullable = false)
     private Date data;
+
+    public NotificacaoUser(String username, String mensagem){
+        this.username = username;
+        this.mensagem = mensagem;
+        this.visto = false;
+        this.data = new Date();
+    }
 }

@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,10 +56,7 @@ public class GrupoService {
 
             List<GrupoUsers> listaGrupoUsers = users.stream()
                     .map(user -> {
-                        GrupoUsers grupo = new GrupoUsers();
-                        grupo.setIdGrupo(idGrupo);
-                        grupo.setUsername(user.username());
-                        return grupo;
+                        return new GrupoUsers(idGrupo, user.username());
                     })
                     .collect(Collectors.toList());
 
@@ -87,12 +83,7 @@ public class GrupoService {
 
         grupoUserRepository.deleteByUsernameAndIdGrupo(username, idGrupo);
 
-        Message infoMessage = new Message();
-        infoMessage.setIdGrupo(idGrupo);
-        infoMessage.setUsername("INFO");
-        infoMessage.setMensagem(username + " saiu do grupo");
-        infoMessage.setNotificacao(true);
-        infoMessage.setData(new Date());
+        Message infoMessage = new Message(idGrupo, username + " saiu do grupo");
 
         messageRepository.save(infoMessage);
 
@@ -127,10 +118,7 @@ public class GrupoService {
             List<GrupoUsers> usersToAdd = usernames.stream()
                     .filter(username -> existingUsers.stream().noneMatch(user -> user.getUsername().equals(username)))
                     .map(username -> {
-                        GrupoUsers newUser = new GrupoUsers();
-                        newUser.setIdGrupo(id);
-                        newUser.setUsername(username);
-                        return newUser;
+                        return new GrupoUsers(id, username);
                     })
                     .toList();
 
@@ -169,13 +157,7 @@ public class GrupoService {
     private void infoMessagesCriarEnviar(long grupoId, List<GrupoUsers> infoUser, String mensagem){
         List<Message> addInfoMessages = infoUser.stream()
                 .map(user -> {
-                    Message infoMessage = new Message();
-                    infoMessage.setIdGrupo(grupoId);
-                    infoMessage.setUsername("INFO");
-                    infoMessage.setMensagem(user.getUsername() + mensagem);
-                    infoMessage.setNotificacao(true);
-                    infoMessage.setData(new Date());
-                    return infoMessage;
+                    return new Message(grupoId, user.getUsername() + mensagem);
                 }).toList();
 
         messageRepository.saveAll(addInfoMessages);
@@ -187,12 +169,7 @@ public class GrupoService {
 
         List<NotificacaoUser> notificacoes = usuarios.stream()
                 .map(user -> {
-                    NotificacaoUser notificacao = new NotificacaoUser();
-                    notificacao.setUsername(user.getUsername());
-                    notificacao.setMensagem(mensagem);
-                    notificacao.setVisto(false);
-                    notificacao.setData(new Date());
-                    return notificacao;
+                    return new NotificacaoUser(user.getUsername(), mensagem);
                 })
                 .toList();
 

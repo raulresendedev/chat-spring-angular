@@ -32,4 +32,12 @@ public class Message {
     @Column(name = "DATA", nullable = false)
     private Date data;
 
+    public Message(long idGrupo, String mensagem){
+        this.idGrupo = idGrupo;
+        this.username = "INFO";
+        this.mensagem = mensagem;
+        this.notificacao = true;
+        this.data = new Date();
+    }
+
 }

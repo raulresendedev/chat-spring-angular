@@ -20,4 +20,9 @@ public class GrupoUsers {
 
     @Column(name = "USERNAME", nullable = false)
     private String username;
+
+    public GrupoUsers(long idGrupo, String username){
+        this.idGrupo = idGrupo;
+        this.username = username;
+    }
 }
