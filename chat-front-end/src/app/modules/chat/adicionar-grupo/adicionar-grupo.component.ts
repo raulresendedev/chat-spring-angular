@@ -56,6 +56,9 @@ export class AdicionarGrupoComponent implements OnInit {
 
     if(this.isEditar()){
       this.usersDoGrupo()
+      if(this.formulario.value.nome.length >= 5 && this.validarUsuariosSelecionados()){
+        this.formularioValido = true
+      }
     }
   }
 

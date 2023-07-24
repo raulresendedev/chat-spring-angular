@@ -51,6 +51,7 @@ public class GrupoService {
         }
     }
 
+    @Transactional
     private ResponseEntity<?> adicionarUsuariosAoGrupo(long idGrupo, String nomeGrupo, List<UserDto> users){
         try{
 

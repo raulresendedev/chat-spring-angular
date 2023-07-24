@@ -1,5 +1,6 @@
+<div class="content">
 <form [formGroup]="formulario">
-    <div class="formgrid grid">
+    <div class="formgrid grid f-1">
         <div class="field col-12 md:col-6 gap-form">
             <span class="p-float-label">
                 <input pInputText class="w-full" formControlName="nome" maxlength="50" />
@@ -31,7 +32,6 @@
         </div>
     </div>
 </form>
-
 <div class="cancelarAdicionarContainer">
     <p-button styleClass="p-button-secondary" label="Cancelar" (click)="fecharModal()"></p-button>
 
@@ -42,7 +42,8 @@
     </div>
     <div *ngIf="isEditar()">
         <p-button styleClass="p-button-success" icon="pi pi-save" label="Salvar" 
-                [disabled]="!formularioValido" (onClick)="editar()"
+                [disabled]="!formularioValido || validarUsuariosSelecionados()" (onClick)="editar()"
                 [loading]="loading"></p-button>
     </div>
+</div>
 </div>
