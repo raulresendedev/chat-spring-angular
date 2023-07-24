@@ -36,6 +36,6 @@ public class GrupoController {
 
     @DeleteMapping("/{idGrupo}/{username}")
     public ResponseEntity<?> removerUserDoGrupo(@PathVariable("idGrupo") Long idGrupo, @PathVariable("username") String username){
-        return grupoService.removerUserDoGrupo(idGrupo, username);
+        return grupoService.sairDoGrupo(idGrupo, username);
     }
 }

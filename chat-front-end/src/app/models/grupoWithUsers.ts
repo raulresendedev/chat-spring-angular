@@ -4,5 +4,6 @@ export interface GrupoWithUsers{
 
     idGrupo: number;
     nome: string;
+    usuarioAcao: string;
     users: User[];
 }

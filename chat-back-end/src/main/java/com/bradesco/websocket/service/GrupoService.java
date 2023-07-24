@@ -35,12 +35,12 @@ public class GrupoService {
         Grupo novoGrupo = new Grupo(grupoDto);
 
         try{
-            grupoRepository.save(novoGrupo);
+            infoMessagecriarGrupo(novoGrupo, grupoDto.usuarioAcao());
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
 
-        return adicionarUsuariosAoGrupo(novoGrupo.getIdGrupo(), grupoDto.nome(), grupoDto.users());
+        return adicionarUsuariosAoGrupo(novoGrupo.getIdGrupo(), grupoDto.nome(), grupoDto.usuarioAcao(), grupoDto.users());
     }
 
     public ResponseEntity<?> obterGrupos(String username){
@@ -52,7 +52,7 @@ public class GrupoService {
     }
 
     @Transactional
-    private ResponseEntity<?> adicionarUsuariosAoGrupo(long idGrupo, String nomeGrupo, List<UserDto> users){
+    private ResponseEntity<?> adicionarUsuariosAoGrupo(long idGrupo, String nomeGrupo, String usuarioAcao, List<UserDto> users){
         try{
 
             List<GrupoUsers> listaGrupoUsers = users.stream()
@@ -63,9 +63,11 @@ public class GrupoService {
 
             grupoUserRepository.saveAll(listaGrupoUsers);
 
-            infoMessagesCriarEnviar(idGrupo, listaGrupoUsers, " foi adicionado ao grupo");
+            listaGrupoUsers.removeIf(x -> x.getUsername().equals(usuarioAcao));
 
-            notificoesCriarEnviar(listaGrupoUsers, "Você foi adicionado ao grupo " + nomeGrupo);
+            infoMessagesAdicionarUsuarios(idGrupo, listaGrupoUsers, usuarioAcao);
+
+            notificacoesAdionarUsuarios(listaGrupoUsers, usuarioAcao,  nomeGrupo);
 
             users.stream()
                     .map(UserDto::username)
@@ -80,15 +82,11 @@ public class GrupoService {
     }
 
     @Transactional
-    public ResponseEntity<?> removerUserDoGrupo(long idGrupo, String username){
+    public ResponseEntity<?> sairDoGrupo(long idGrupo, String username){
 
         grupoUserRepository.deleteByUsernameAndIdGrupo(username, idGrupo);
 
-        Message infoMessage = new Message(idGrupo, username + " saiu do grupo");
-
-        messageRepository.save(infoMessage);
-
-        websocketService.notifyGroupInfo(infoMessage);
+        infoMessageSairDoGrupo(idGrupo, username);
 
         return ResponseEntity.ok("Saiu do Grupo");
     }
@@ -131,13 +129,13 @@ public class GrupoService {
 
             grupoUserRepository.deleteAll(usersToDelete);
 
-            infoMessagesCriarEnviar(id, usersToAdd, " foi adicionado ao grupo");
+            infoMessagesAdicionarUsuarios(id, usersToAdd, grupoDto.usuarioAcao());
 
-            infoMessagesCriarEnviar(id, usersToDelete, " foi removido do grupo");
+            infoMessagesRemoverUsuarios(id, usersToDelete, grupoDto.usuarioAcao());
 
-            notificoesCriarEnviar(usersToAdd, "Você foi adicionado ao grupo " + grupo.getNome());
+            notificacoesAdionarUsuarios(usersToAdd, grupoDto.usuarioAcao(),  grupo.getNome());
 
-            notificoesCriarEnviar(usersToDelete, "Você foi removido do grupo " + grupo.getNome());
+            notificacoesRemoverUsuarios(usersToDelete, grupoDto.usuarioAcao(), grupo.getNome());
 
             usersToDelete.stream()
                     .map(GrupoUsers::getUsername)
@@ -155,22 +153,71 @@ public class GrupoService {
         }
     }
 
-    private void infoMessagesCriarEnviar(long grupoId, List<GrupoUsers> infoUser, String mensagem){
-        List<Message> addInfoMessages = infoUser.stream()
-                .map(user -> {
-                    return new Message(grupoId, user.getUsername() + mensagem);
+    private void infoMessagecriarGrupo(Grupo novoGrupo, String usuarioAcao){
+
+        grupoRepository.save(novoGrupo);
+
+        Message mensagem = new Message(novoGrupo.getIdGrupo(),usuarioAcao + " criou o grupo");
+
+        messageRepository.save(mensagem);
+
+        websocketService.notifyGroupInfo(mensagem);
+    }
+
+    private void infoMessageSairDoGrupo(long idGrupo, String usuario){
+
+        Message mensagem = new Message(idGrupo,usuario + " saiu do grupo");
+
+        messageRepository.save(mensagem);
+
+        websocketService.notifyGroupInfo(mensagem);
+    }
+
+    private void infoMessagesAdicionarUsuarios(long grupoId, List<GrupoUsers> usuariosAdicionados, String usuarioAcao){
+
+        List<Message> addInfoMessages = usuariosAdicionados.stream()
+                .map(userioAdicionado -> {
+                    return new Message(grupoId, usuarioAcao + " adicionou " + userioAdicionado.getUsername() + " ao grupo");
                 }).toList();
 
         messageRepository.saveAll(addInfoMessages);
 
         addInfoMessages.forEach(websocketService::notifyGroupInfo);
+
     }
 
-    private void notificoesCriarEnviar(List<GrupoUsers> usuarios, String mensagem){
+    private void infoMessagesRemoverUsuarios(long grupoId, List<GrupoUsers> usuariosRemovidos, String usuarioAcao){
 
-        List<NotificacaoUser> notificacoes = usuarios.stream()
-                .map(user -> {
-                    return new NotificacaoUser(user.getUsername(), mensagem);
+        List<Message> deleteInfoMessages = usuariosRemovidos.stream()
+                .map(userioRemovido -> {
+                    return new Message(grupoId, usuarioAcao + " removeu " + userioRemovido.getUsername() + " do grupo");
+                }).toList();
+
+        messageRepository.saveAll(deleteInfoMessages);
+
+        deleteInfoMessages.forEach(websocketService::notifyGroupInfo);
+
+    }
+
+    private void notificacoesAdionarUsuarios(List<GrupoUsers> usuariosAdicionados, String usuarioAcao, String nomeGrupo){
+
+        List<NotificacaoUser> notificacoes = usuariosAdicionados.stream()
+                .map(usuarioAdicionado -> {
+                    return new NotificacaoUser(usuarioAdicionado.getUsername(), usuarioAcao + " te adicionou ao grupo " + nomeGrupo);
+                })
+                .toList();
+
+        notificacaoUserRepository.saveAll(notificacoes);
+
+        notificacoes
+                .forEach(websocketService::enviarNotificacaoUser);
+    }
+
+    private void notificacoesRemoverUsuarios(List<GrupoUsers> usuariosRemovidos, String usuarioAcao, String nomeGrupo){
+
+        List<NotificacaoUser> notificacoes = usuariosRemovidos.stream()
+                .map(usuarioRemovido -> {
+                    return new NotificacaoUser(usuarioRemovido.getUsername(), usuarioAcao + " te removeu do grupo " + nomeGrupo);
                 })
                 .toList();
 

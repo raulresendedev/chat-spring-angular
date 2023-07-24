@@ -112,7 +112,8 @@ export class AdicionarGrupoComponent implements OnInit {
   adicionar(){
     const formData = this.formulario.value as GrupoWithUsers
     formData.users = this.usuariosSelecionados
-    
+    formData.usuarioAcao = this.authService.getUserName();
+
     this.grupoService.adicionarGrupo(formData).subscribe(
       (response) => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Grupo criado com sucesso!' });
@@ -127,6 +128,8 @@ export class AdicionarGrupoComponent implements OnInit {
   editar(){
     const formData = this.formulario.value as GrupoWithUsers
     formData.users = this.usuariosSelecionados
+    formData.usuarioAcao = this.authService.getUserName();
+    
     this.grupoService.editarGrupo(this.grupoSelecionado.idGrupo, formData).subscribe(
       (response) => {
         this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Grupo editado com sucesso!' });
